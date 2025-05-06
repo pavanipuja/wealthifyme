@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Goal Progress - WealthifyMe{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Update Goal Progress</h1>
+            <p style="color: var(--neutral-600);">{{ goal[1] }}</p>
+        </div>
+        
+        <div class="card-body">
+            <div style="margin-bottom: 2rem;">
+                <div style="margin-bottom: 1rem;">
+                    <div class="progress" style="height: 1rem;">
+                        <div class="progress-bar" style="width: {{ progress }}%; background-color: var(--secondary-500);"></div>
+                    </div>
+                    <div class="progress-info">
+                        <span>${{ goal[4]|round(2) }} of ${{ goal[3]|round(2) }}</span>
+                        <span>{{ progress|round }}%</span>
+                    </div>
+                </div>
+                
+                <div style="color: var(--neutral-600); font-size: 0.875rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Target Date:</span>
+                        <span>{{ formatted_deadline }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Remaining:</span>
+                        <span>${{ (goal[3] - goal[4])|round(2) }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <form method="POST" action="{{ url_for('goals_bp.update_goal', goal_id=goal[0]) }}">
+                <div class="form-group">
+                    <label for="current_amount" class="form-label">Current Amount ($) *</label>
+                    <input type="number" id="current_amount" name="current_amount" class="form-control" step="0.01" min="0" max="{{ goal[3] }}" value="{{ goal[4] }}" required>
+                </div>
+                
+                <div class="form-group" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Update Progress</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - WealthifyMe{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="section-header">
+        <h1 class="section-title">Welcome, {{ session.name }}</h1>
+        <a href="{{ url_for('expenses_bp.add_expense') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Expense
+        </a>
+    </div>
+    
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card animate-fadeIn">
+            <div class="stat-title">This Month's Spending</div>
+            <div class="stat-value">
+                ${{ months_data|safe|replace('"', '')|last|attr('total')|round(2) }}
+            </div>
+            {% set previous_month = months_data|safe|replace('"', '')|length - 2 %}
+            {% set current_month = months_data|safe|replace('"', '')|length - 1 %}
+            {% if months_data|safe|replace('"', '')|attr(previous_month, 'total') > 0 %}
+                {% set percent_change = ((months_data|safe|replace('"', '')|attr(current_month, 'total') - months_data|safe|replace('"', '')|attr(previous_month, 'total')) / months_data|safe|replace('"', '')|attr(previous_month, 'total') * 100)|round %}
+                <div class="stat-change {% if percent_change < 0 %}positive{% else %}negative{% endif %}">
+                    <i class="fas fa-{% if percent_change < 0 %}arrow-down{% else %}arrow-up{% endif %}"></i>
+                    {{ percent_change|abs }}% from last month
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="stat-card animate-fadeIn" style="animation-delay: 0.1s;">
+            <div class="stat-title">Budget Status</div>
+            <div class="stat-value">
+                {% set total_budget = 0 %}
+                {% set total_spent = 0 %}
+                {% for budget in budgets %}
+                    {% set total_budget = total_budget + budget[1] %}
+                    {% set total_spent = total_spent + budget[6] %}
+                {% endfor %}
+                {% if total_budget > 0 %}
+                    {{ (total_spent / total_budget * 100)|round }}% Used
+                {% else %}
+                    No budgets set
+                {% endif %}
+            </div>
+            {% if total_budget > 0 %}
+                <div class="stat-change {% if total_spent <= total_budget %}positive{% else %}negative{% endif %}">
+                    {% if total_spent <= total_budget %}
+                        <i class="fas fa-check-circle"></i> Within budget
+                    {% else %}
+                        <i class="fas fa-exclamation-circle"></i> Over budget
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="stat-card animate-fadeIn" style="animation-delay: 0.2s;">
+            <div class="stat-title">Active Goals</div>
+            <div class="stat-value">{{ goals|length }}</div>
+            {% if goals|length > 0 %}
+                {% set closest_goal = goals|sort(attribute=4)|first %}
+                <div class="stat-change">
+                    <i class="fas fa-calendar"></i> Next goal: {{ closest_goal[1] }}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="stat-card animate-fadeIn" style="animation-delay: 0.3s;">
+            <div class="stat-title">Top Category</div>
+            {% if category_data|length > 0 %}
+                <div class="stat-value">{{ category_data[0][0] }}</div>
+                <div class="stat-change">
+                    <i class="fas fa-tag"></i> ${{ category_data[0][2]|round(2) }}
+                </div>
+            {% else %}
+                <div class="stat-value">No data yet</div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Charts -->
+    <div class="charts-container">
+        <div class="chart-card animate-fadeIn">
+            <div class="chart-header">
+                <h2 class="card-title">Monthly Spending Trend</h2>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="monthlySpendingChart" data-spending="{{ months_data }}"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card animate-fadeIn" style="animation-delay: 0.1s;">
+            <div class="chart-header">
+                <h2 class="card-title">Spending by Category</h2>
+            </div>
+            <div style="height: 300px;">
+                <canvas id="categorySpendingChart" data-categories="{{ category_data|tojson }}"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Budgets Overview -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Budget Overview</h2>
+            <a href="{{ url_for('budgets_bp.add_budget') }}" class="btn btn-outline">
+                <i class="fas fa-plus"></i> Add Budget
+            </a>
+        </div>
+        
+        {% if budgets|length > 0 %}
+            <div class="row">
+                {% for budget in budgets %}
+                    <div class="col" style="min-width: 300px; margin-bottom: 1rem;">
+                        <div class="budget-card animate-fadeIn" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                            <div class="budget-header">
+                                <div class="budget-category">
+                                    <span class="category-pill" style="background-color: {{ budget[5] }}; color: {% if budget[5] in ['#ffffff', '#f8fafc', '#f1f5f9', '#fef3c7', '#fffbeb'] %}var(--neutral-800){% else %}white{% endif %};">
+                                        {{ budget[4] }}
+                                    </span>
+                                </div>
+                                <div class="budget-amount">${{ budget[1]|round(2) }}</div>
+                            </div>
+                            <div class="budget-progress">
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: {{ min(budget[6] / budget[1] * 100, 100) }}%; background-color: {% if budget[6] > budget[1] %}var(--error-500){% else %}var(--primary-500){% endif %};"></div>
+                                </div>
+                                <div class="progress-info">
+                                    <span>Spent: ${{ budget[6]|round(2) }}</span>
+                                    <span>{{ min(budget[6] / budget[1] * 100, 100)|round }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <p style="color: var(--neutral-600); margin-bottom: 1rem;">You haven't set any budgets yet.</p>
+                <a href="{{ url_for('budgets_bp.add_budget') }}" class="btn btn-primary">Create Your First Budget</a>
+            </div>
+        {% endif %}
+    </section>
+    
+    <!-- Recent Expenses -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Recent Expenses</h2>
+            <a href="{{ url_for('expenses_bp.expenses') }}" class="btn btn-outline">View All</a>
+        </div>
+        
+        {% if recent_expenses|length > 0 %}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for expense in recent_expenses %}
+                            <tr>
+                                <td>{{ expense[3].strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="category-pill" style="background-color: {{ expense[5] }}; color: {% if expense[5] in ['#ffffff', '#f8fafc', '#f1f5f9', '#fef3c7', '#fffbeb'] %}var(--neutral-800){% else %}white{% endif %};">
+                                        {{ expense[4] }}
+                                    </span>
+                                </td>
+                                <td>{{ expense[2] }}</td>
+                                <td style="font-weight: 600;">${{ expense[1]|round(2) }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <p style="color: var(--neutral-600); margin-bottom: 1rem;">You haven't logged any expenses yet.</p>
+                <a href="{{ url_for('expenses_bp.add_expense') }}" class="btn btn-primary">Add Your First Expense</a>
+            </div>
+        {% endif %}
+    </section>
+    
+    <!-- Goals Overview -->
+    <section class="section">
+        <div class="section-header">
+            <h2 class="section-title">Financial Goals</h2>
+            <a href="{{ url_for('goals_bp.add_goal') }}" class="btn btn-outline">
+                <i class="fas fa-plus"></i> Add Goal
+            </a>
+        </div>
+        
+        {% if goals|length > 0 %}
+            <div class="goals-grid">
+                {% for goal in goals %}
+                    {% set progress = (goal[3] / goal[2] * 100)|round %}
+                    <div class="goal-card card animate-fadeIn" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                        <h3 class="card-title">{{ goal[1] }}</h3>
+                        
+                        <div style="margin: 1rem 0;">
+                            <div class="progress">
+                                <div class="progress-bar" style="width: {{ progress }}%; background-color: var(--secondary-500);"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span>${{ goal[3]|round(2) }} of ${{ goal[2]|round(2) }}</span>
+                                <span>{{ progress }}%</span>
+                            </div>
+                        </div>
+                        
+                        <div style="color: var(--neutral-600); font-size: 0.875rem;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Target Date:</span>
+                                <span>{{ goal[4].strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-top: 0.5rem;">
+                                <span>Remaining:</span>
+                                <span>${{ (goal[2] - goal[3])|round(2) }}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; text-align: right;">
+                            <a href="{{ url_for('goals_bp.update_goal', goal_id=goal[0]) }}" class="btn btn-sm btn-outline">Update Progress</a>
+                        </div>
+                        
+                        <div class="goal-progress" style="width: {{ progress }}%;"></div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <p style="color: var(--neutral-600); margin-bottom: 1rem;">You haven't set any financial goals yet.</p>
+                <a href="{{ url_for('goals_bp.add_goal') }}" class="btn btn-primary">Create Your First Goal</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

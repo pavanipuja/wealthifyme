@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container" style="margin-top: 4rem;">
+    <section class="hero" style="text-align: center; margin-bottom: 4rem;">
+        <h1 style="font-size: 3rem; font-weight: 700; margin-bottom: 1rem; color: var(--primary-600);">
+            Take Control of Your Finances
+        </h1>
+        <p style="font-size: 1.25rem; color: var(--neutral-600); max-width: 800px; margin: 0 auto 2rem;">
+            WealthifyMe helps you track expenses, set budgets, and achieve your financial goals with powerful insights and social features.
+        </p>
+        <div class="hero-actions">
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg" style="margin-right: 1rem;">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline btn-lg">Login</a>
+        </div>
+    </section>
+    
+    <div class="features" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 4rem;">
+        <div class="feature-card card animate-slideInUp" style="text-align: center;">
+            <div style="font-size: 2.5rem; color: var(--primary-500); margin-bottom: 1rem;">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">Track Your Expenses</h3>
+            <p style="color: var(--neutral-600);">
+                Log and categorize your spending to see where your money goes each month.
+            </p>
+        </div>
+        
+        <div class="feature-card card animate-slideInUp" style="text-align: center; animation-delay: 0.1s;">
+            <div style="font-size: 2.5rem; color: var(--secondary-500); margin-bottom: 1rem;">
+                <i class="fas fa-bullseye"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">Set Budgets</h3>
+            <p style="color: var(--neutral-600);">
+                Create monthly budgets by category and receive alerts when you exceed your limits.
+            </p>
+        </div>
+        
+        <div class="feature-card card animate-slideInUp" style="text-align: center; animation-delay: 0.2s;">
+            <div style="font-size: 2.5rem; color: var(--accent-400); margin-bottom: 1rem;">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">Social Features</h3>
+            <p style="color: var(--neutral-600);">
+                Share savings challenges with friends and compare your spending anonymously with peers.
+            </p>
+        </div>
+    </div>
+    
+    <section class="how-it-works" style="margin-bottom: 4rem;">
+        <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 3rem; color: var(--neutral-900);">
+            How WealthifyMe Works
+        </h2>
+        
+        <div class="steps" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
+            <div class="step" style="flex: 1; min-width: 250px; text-align: center; padding: 0 1rem;">
+                <div class="step-number" style="width: 3rem; height: 3rem; line-height: 3rem; background-color: var(--primary-500); color: white; border-radius: 50%; margin: 0 auto 1rem; font-weight: 600;">1</div>
+                <h3 style="margin-bottom: 0.5rem;">Sign Up</h3>
+                <p style="color: var(--neutral-600);">Create your free account in seconds to get started.</p>
+            </div>
+            
+            <div class="step" style="flex: 1; min-width: 250px; text-align: center; padding: 0 1rem;">
+                <div class="step-number" style="width: 3rem; height: 3rem; line-height: 3rem; background-color: var(--primary-500); color: white; border-radius: 50%; margin: 0 auto 1rem; font-weight: 600;">2</div>
+                <h3 style="margin-bottom: 0.5rem;">Track Expenses</h3>
+                <p style="color: var(--neutral-600);">Log your expenses and categorize them for better insights.</p>
+            </div>
+            
+            <div class="step" style="flex: 1; min-width: 250px; text-align: center; padding: 0 1rem;">
+                <div class="step-number" style="width: 3rem; height: 3rem; line-height: 3rem; background-color: var(--primary-500); color: white; border-radius: 50%; margin: 0 auto 1rem; font-weight: 600;">3</div>
+                <h3 style="margin-bottom: 0.5rem;">Set Budgets</h3>
+                <p style="color: var(--neutral-600);">Create budgets for each category to control your spending.</p>
+            </div>
+            
+            <div class="step" style="flex: 1; min-width: 250px; text-align: center; padding: 0 1rem;">
+                <div class="step-number" style="width: 3rem; height: 3rem; line-height: 3rem; background-color: var(--primary-500); color: white; border-radius: 50%; margin: 0 auto 1rem; font-weight: 600;">4</div>
+                <h3 style="margin-bottom: 0.5rem;">Analyze & Improve</h3>
+                <p style="color: var(--neutral-600);">Get insights and improve your financial habits over time.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta" style="text-align: center; background-color: var(--primary-50); padding: 4rem 2rem; border-radius: 1rem; margin-bottom: 4rem;">
+        <h2 style="font-size: 2rem; font-weight: 600; margin-bottom: 1rem; color: var(--primary-700);">
+            Ready to Take Control of Your Finances?
+        </h2>
+        <p style="font-size: 1.125rem; color: var(--neutral-600); max-width: 600px; margin: 0 auto 2rem;">
+            Join thousands of users who are improving their financial health with WealthifyMe.
+        </p>
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Get Started for Free</a>
+    </section>
+    
+    <section class="testimonials" style="margin-bottom: 4rem;">
+        <h2 style="font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 3rem; color: var(--neutral-900);">
+            What Our Users Say
+        </h2>
+        
+        <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <div class="testimonial card">
+                <div style="font-size: 1.25rem; color: var(--accent-400); margin-bottom: 1rem;">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p style="color: var(--neutral-700); font-style: italic; margin-bottom: 1rem;">
+                    "WealthifyMe helped me save over $2,000 in just three months by identifying unnecessary expenses. The budget alerts keep me accountable."
+                </p>
+                <div class="testimonial-author" style="display: flex; align-items: center;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background-color: var(--neutral-300); margin-right: 1rem; display: flex; align-items: center; justify-content: center; color: var(--neutral-600);">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Sarah Johnson</h4>
+                        <p style="color: var(--neutral-500); font-size: 0.875rem;">Using WealthifyMe for 6 months</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial card">
+                <div style="font-size: 1.25rem; color: var(--accent-400); margin-bottom: 1rem;">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+                <p style="color: var(--neutral-700); font-style: italic; margin-bottom: 1rem;">
+                    "The social challenges feature is brilliant. My friends and I competed to save the most, and it made saving money actually fun!"
+                </p>
+                <div class="testimonial-author" style="display: flex; align-items: center;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background-color: var(--neutral-300); margin-right: 1rem; display: flex; align-items: center; justify-content: center; color: var(--neutral-600);">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Michael Chen</h4>
+                        <p style="color: var(--neutral-500); font-size: 0.875rem;">Using WealthifyMe for 3 months</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="testimonial card">
+                <div style="font-size: 1.25rem; color: var(--accent-400); margin-bottom: 1rem;">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+                <p style="color: var(--neutral-700); font-style: italic; margin-bottom: 1rem;">
+                    "The visual charts helped me understand my spending habits and make meaningful changes. I finally achieved my goal of saving for a down payment."
+                </p>
+                <div class="testimonial-author" style="display: flex; align-items: center;">
+                    <div style="width: 3rem; height: 3rem; border-radius: 50%; background-color: var(--neutral-300); margin-right: 1rem; display: flex; align-items: center; justify-content: center; color: var(--neutral-600);">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h4 style="font-weight: 600; margin-bottom: 0.25rem;">Alex Rodriguez</h4>
+                        <p style="color: var(--neutral-500); font-size: 0.875rem;">Using WealthifyMe for 1 year</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block title %}Budgets - WealthifyMe{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="section-header">
+        <h1 class="section-title">
+            Budgets
+            <span style="font-size: 1rem; font-weight: normal; color: var(--neutral-600); margin-left: 0.5rem;">
+                {% set month_name = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][current_month - 1] %}
+                {{ month_name }} {{ current_year }}
+            </span>
+        </h1>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="{{ url_for('budgets_bp.add_budget') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Budget
+            </a>
+            
+            {% if budget_periods|length > 0 %}
+                <div class="dropdown" style="position: relative; display: inline-block;">
+                    <button class="btn btn-outline" style="display: flex; align-items: center;">
+                        <i class="fas fa-calendar-alt" style="margin-right: 0.5rem;"></i>
+                        Switch Period
+                        <i class="fas fa-chevron-down" style="margin-left: 0.5rem;"></i>
+                    </button>
+                    <div class="dropdown-content" style="display: none; position: absolute; right: 0; min-width: 160px; z-index: 1; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); border-radius: 0.375rem; padding: 0.5rem 0;">
+                        {% for period in budget_periods %}
+                            {% set month_name = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][period[0] - 1] %}
+                            <a href="{{ url_for('budgets_bp.view_period', month=period[0], year=period[1]) }}" style="display: block; padding: 0.5rem 1rem; color: var(--neutral-700); text-decoration: none; {% if period[0] == current_month and period[1] == current_year %}font-weight: 600; color: var(--primary-600);{% endif %}">
+                                {{ month_name }} {{ period[1] }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const dropdown = document.querySelector('.dropdown');
+                        const dropdownContent = document.querySelector('.dropdown-content');
+                        
+                        dropdown.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+                        });
+                        
+                        document.addEventListener('click', function() {
+                            dropdownContent.style.display = 'none';
+                        });
+                    });
+                </script>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Budget Overview -->
+    <div class="card animate-fadeIn" style="margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+            <div>
+                <h2 style="font-size: 1.25rem; margin-bottom: 0.5rem;">Monthly Budget Overview</h2>
+                <p style="color: var(--neutral-600);">Track your spending against your budget</p>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.25rem;">
+                    ${{ total_spent|round(2) }} / ${{ total_budget|round(2) }}
+                </div>
+                <div style="font-size: 0.875rem; color: {% if total_spent > total_budget %}var(--error-500){% elif total_spent > total_budget * 0.9 %}var(--warning-500){% else %}var(--success-500){% endif %};">
+                    {% if total_spent > total_budget %}
+                        <i class="fas fa-exclamation-circle"></i> Over budget by ${{ (total_spent - total_budget)|round(2) }}
+                    {% elif total_spent > total_budget * 0.9 %}
+                        <i class="fas fa-exclamation-triangle"></i> Approaching limit ({{ (total_spent / total_budget * 100)|round }}%)
+                    {% else %}
+                        <i class="fas fa-check-circle"></i> {{ (total_spent / total_budget * 100)|round if total_budget > 0 else 0 }}% of budget used
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="progress" style="height: 0.75rem; margin-bottom: 0.5rem;">
+            <div class="progress-bar" style="width: {{ (total_spent / total_budget * 100)|round if total_budget > 0 else 0 }}%; background-color: {% if total_spent > total_budget %}var(--error-500){% elif total_spent > total_budget * 0.9 %}var(--warning-500){% else %}var(--primary-500){% endif %};"></div>
+        </div>
+    </div>
+    
+    <!-- Budget Categories -->
+    {% if budgets|length > 0 %}
+        <div class="row">
+            {% for budget in budgets %}
+                <div class="col" style="min-width: 300px; margin-bottom: 1rem;">
+                    <div class="budget-card animate-fadeIn" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                        <div class="budget-header">
+                            <div class="budget-category">
+                                <i class="fas fa-tag" style="color: {{ budget[5] }}; margin-right: 0.5rem;"></i>
+                                {{ budget[4] }}
+                            </div>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <a href="{{ url_for('budgets_bp.edit_budget', budget_id=budget[0]) }}" class="btn btn-sm btn-outline">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('budgets_bp.delete_budget', budget_id=budget[0]) }}" style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-outline" style="color: var(--error-500);" onclick="return confirm('Are you sure you want to delete this budget?');">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 1rem 0; display: flex; align-items: center; gap: 1rem;">
+                            <div style="position: relative; width: 70px; height: 70px;">
+                                <canvas class="budget-chart" data-spent="{{ budget[7] }}" data-budget="{{ budget[1] }}"></canvas>
+                            </div>
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--neutral-600); margin-bottom: 0.25rem;">
+                                    <span>Spent:</span>
+                                    <span>${{ budget[7]|round(2) }}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--neutral-600); margin-bottom: 0.25rem;">
+                                    <span>Budget:</span>
+                                    <span>${{ budget[1]|round(2) }}</span>
+                                </div>
+                                {% if budget[7] > budget[1] %}
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--error-500); margin-bottom: 0.25rem;">
+                                        <span>Over by:</span>
+                                        <span>${{ (budget[7] - budget[1])|round(2) }}</span>
+                                    </div>
+                                {% else %}
+                                    <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: var(--success-500); margin-bottom: 0.25rem;">
+                                        <span>Remaining:</span>
+                                        <span>${{ (budget[1] - budget[7])|round(2) }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: 2rem;">
+            <p style="color: var(--neutral-600); margin-bottom: 1rem;">You haven't set any budgets for this period.</p>
+            <a href="{{ url_for('budgets_bp.add_budget') }}" class="btn btn-primary">Create Your First Budget</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

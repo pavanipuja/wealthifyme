@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WealthifyMe - Personal Finance Tracker{% endblock %}</title>
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="{{ url_for('index') }}" class="navbar-logo">
+                <i class="fas fa-wallet"></i>
+                WealthifyMe
+            </a>
+            
+            <button class="mobile-menu-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <ul class="navbar-menu">
+                {% if 'user_id' in session %}
+                    <li class="navbar-item">
+                        <a href="{{ url_for('dashboard') }}" class="navbar-link {% if request.path == url_for('dashboard') %}active{% endif %}">Dashboard</a>
+                    </li>
+                    <li class="navbar-item">
+                        <a href="{{ url_for('expenses_bp.expenses') }}" class="navbar-link {% if '/expenses' in request.path %}active{% endif %}">Expenses</a>
+                    </li>
+                    <li class="navbar-item">
+                        <a href="{{ url_for('budgets_bp.budgets') }}" class="navbar-link {% if '/budgets' in request.path %}active{% endif %}">Budgets</a>
+                    </li>
+                    <li class="navbar-item">
+                        <a href="{{ url_for('goals_bp.goals') }}" class="navbar-link {% if '/goals' in request.path %}active{% endif %}">Goals</a>
+                    </li>
+                    <li class="navbar-item">
+                        <a href="{{ url_for('social_bp.social') }}" class="navbar-link {% if '/social' in request.path %}active{% endif %}">Social</a>
+                    </li>
+                    <li class="navbar-item">
+                        <a href="{{ url_for('logout') }}" class="navbar-link">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="navbar-item">
+                        <a href="{{ url_for('login') }}" class="navbar-link {% if request.path == url_for('login') %}active{% endif %}">Login</a>
+                    </li>
+                    <li class="navbar-item">
+                        <a href="{{ url_for('register') }}" class="navbar-link {% if request.path == url_for('register') %}active{% endif %}">Register</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="container" style="margin-top: 1rem;">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="footer" style="margin-top: 3rem; padding: 2rem 0; background-color: var(--neutral-100); text-align: center;">
+        <div class="container">
+            <p>&copy; {% now year %} WealthifyMe. All rights reserved.</p>
+        </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

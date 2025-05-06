@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Social - WealthifyMe{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 2rem;">
+    <div class="section-header">
+        <h1 class="section-title">Social</h1>
+    </div>
+    
+    <!-- Tabs Navigation -->
+    <div class="tabs" style="margin-bottom: 2rem;">
+        <div class="tabs-header" style="display: flex; border-bottom: 1px solid var(--neutral-200);">
+            <button class="tab-link active" data-tab="challenges" style="padding: 1rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--primary-600); border-bottom: 3px solid var(--primary-600);">
+                <i class="fas fa-trophy" style="margin-right: 0.5rem;"></i> Saving Challenges
+            </button>
+            <button class="tab-link" data-tab="groups" style="padding: 1rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--neutral-600);">
+                <i class="fas fa-users" style="margin-right: 0.5rem;"></i> Expense Groups
+            </button>
+            <button class="tab-link" data-tab="comparison" style="padding: 1rem; font-weight: 600; border: none; background: none; cursor: pointer; color: var(--neutral-600);">
+                <i class="fas fa-chart-bar" style="margin-right: 0.5rem;"></i> Spending Comparison
+            </button>
+        </div>
+    </div>
+    
+    <!-- Challenges Tab -->
+    <div id="challenges" class="tab-content" style="display: block;">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <a href="{{ url_for('social_bp.create_challenge') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Challenge
+            </a>
+        </div>
+        
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 1rem;">Your Challenges</h2>
+        
+        {% if user_challenges|length > 0 %}
+            <div class="goals-grid">
+                {% for challenge in user_challenges %}
+                    {% set progress = (challenge[6] / challenge[3] * 100)|round %}
+                    {% set days_left = (challenge[5] - now()).days %}
+                    
+                    <div class="card animate-fadeIn" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                        <h3 class="card-title">{{ challenge[1] }}</h3>
+                        
+                        {% if challenge[2] %}
+                            <p style="color: var(--neutral-600); margin: 0.5rem 0; font-size: 0.875rem;">
+                                {{ challenge[2] }}
+                            </p>
+                        {% endif %}
+                        
+                        <div style="margin: 1rem 0;">
+                            <div class="progress">
+                                <div class="progress-bar" style="width: {{ progress }}%; background-color: var(--accent-400);"></div>
+                            </div>
+                            <div class="progress-info">
+                                <span>${{ challenge[6]|round(2) }} of ${{ challenge[3]|round(2) }}</span>
+                                <span>{{ progress }}%</span>
+                            </div>
+                        </div>
+                        
+                        <div style="color: var(--neutral-600); font-size: 0.875rem;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>End Date:</span>
+                                <span>{{ challenge[5].strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Days Left:</span>
+                                <span>{{ days_left if days_left > 0 else 'Expired' }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Participants:</span>
+                                <span>{{ challenge[7] }}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; text-align: right;">
+                            <a href="{{ url_for('social_bp.view_challenge', challenge_id=challenge[0]) }}" class="btn btn-sm btn-outline">View Details</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card" style="text-align: center; padding: 2rem; margin-bottom: 2rem;">
+                <p style="color: var(--neutral-600); margin-bottom: 1rem;">You're not participating in any challenges yet.</p>
+                <a href="{{ url_for('social_bp.create_challenge') }}" class="btn btn-primary">Create Your First Challenge</a>
+            </div>
+        {% endif %}
+        
+        <h2 class="section-title" style="font-size: 1.25rem; margin: 2rem 0 1rem;">Discover Public Challenges</h2>
+        
+        {% if public_challenges|length > 0 %}
+            <div class="goals-grid">
+                {% for challenge in public_challenges %}
+                    {% set days_left = (challenge[5] - now()).days %}
+                    
+                    <div class="card animate-fadeIn" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                        <h3 class="card-title">{{ challenge[1] }}</h3>
+                        
+                        {% if challenge[2] %}
+                            <p style="color: var(--neutral-600); margin: 0.5rem 0; font-size: 0.875rem;">
+                                {{ challenge[2] }}
+                            </p>
+                        {% endif %}
+                        
+                        <div style="color: var(--neutral-600); font-size: 0.875rem; margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Target Amount:</span>
+                                <span>${{ challenge[3]|round(2) }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>End Date:</span>
+                                <span>{{ challenge[5].strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                <span>Days Left:</span>
+                                <span>{{ days_left }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>Participants:</span>
+                                <span>{{ challenge[6] }}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem; display: flex; justify-content: space-between;">
+                            <a href="{{ url_for('social_bp.view_challenge', challenge_id=challenge[0]) }}" class="btn btn-sm btn-outline">View Details</a>
+                            <form method="POST" action="{{ url_for('social_bp.join_challenge', challenge_id=challenge[0]) }}">
+                                <button type="submit" class="btn btn-sm btn-primary">Join Challenge</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <p style="color: var(--neutral-600);">No public challenges available right now.</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Groups Tab -->
+    <div id="groups" class="tab-content" style="display: none;">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+            <a href="{{ url_for('social_bp.create_group') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create Group
+            </a>
+        </div>
+        
+        <h2 class="section-title" style="font-size: 1.25rem; margin-bottom: 1rem;">Your Groups</h2>
+        
+        {% if user_groups|length > 0 %}
+            <div class="row">
+                {% for group in user_groups %}
+                    <div class="col" style="min-width: 300px; margin-bottom: 1rem;">
+                        <div class="card animate-fadeIn" style="animation-delay: {{ loop.index0 * 0.1 }}s;">
+                            <h3 class="card-title">{{ group[1] }}</h3>
+                            
+                            {% if group[2] %}
+                                <p style="color: var(--neutral-600); margin: 0.5rem 0; font-size: 0.875rem;">
+                                    {{ group[2] }}
+                                </p>
+                            {% endif %}
+                            
+                            <div style="color: var(--neutral-600); font-size: 0.875rem; margin: 1rem 0;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span>Created:</span>
+                                    <span>{{ group[3].strftime('%b %d, %Y') }}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Members:</span>
+                                    <span>{{ group[4] }}</span>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 1rem; text-align: right;">
+                                <a href="{{ url_for('social_bp.view_group', group_id=group[0]) }}" class="btn btn-sm btn-primary">View Group</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <p style="color: var(--neutral-600); margin-bottom: 1rem;">You're not a member of any expense groups yet.</p>
+                <a href="{{ url_for('social_bp.create_group') }}" class="btn btn-primary">Create Your First Group</a>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Comparison Tab -->
+    <div id="comparison" class="tab-content" style="display: none;">
+        <div class="card">
+            <h2 class="card-title" style="margin-bottom: 1rem;">Anonymous Spending Comparison</h2>
+            <p style="color: var(--neutral-600); margin-bottom: 1.5rem;">
+                See how your spending compares to other users in the same categories.
+                All data is anonymized and aggregated for privacy.
+            </p>
+            
+            {% if spending_comparison|length > 0 %}
+                <div style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Your Spending</th>
+                                <th>Avg. User Spending</th>
+                                <th>Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category in spending_comparison %}
+                                {% if category[1] is not none and category[2] is not none %}
+                                    {% set diff = category[2] - category[1] %}
+                                    {% set percent_diff = (diff / category[1] * 100)|round if category[1] > 0 else 0 %}
+                                    
+                                    <tr>
+                                        <td>{{ category[0] }}</td>
+                                        <td>${{ category[2]|round(2) if category[2] is not none else 0 }}</td>
+                                        <td>${{ category[1]|round(2) }}</td>
+                                        <td style="color: {% if diff < 0 %}var(--success-500){% elif diff > 0 %}var(--error-500){% else %}var(--neutral-600){% endif %};">
+                                            {% if diff < 0 %}
+                                                <i class="fas fa-arrow-down"></i> ${{ (-diff)|round(2) }} ({{ -percent_diff }}%)
+                                            {% elif diff > 0 %}
+                                                <i class="fas fa-arrow-up"></i> ${{ diff|round(2) }} ({{ percent_diff }}%)
+                                            {% else %}
+                                                Same as average
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 1.5rem; color: var(--neutral-600); font-size: 0.875rem;">
+                    <p>
+                        <i class="fas fa-info-circle"></i> 
+                        This comparison is based on data from the current month. Categories with no data are not shown.
+                    </p>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 2rem;">
+                    <p style="color: var(--neutral-600); margin-bottom: 1rem;">No comparison data available yet.</p>
+                    <p style="color: var(--neutral-600); font-size: 0.875rem;">
+                        Start tracking your expenses to see how your spending compares to others.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabLinks = document.querySelectorAll('.tab-link');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Remove active class from all tab links
+                tabLinks.forEach(link => {
+                    link.classList.remove('active');
+                    link.style.color = 'var(--neutral-600)';
+                    link.style.borderBottom = 'none';
+                });
+                
+                // Show the selected tab content
+                document.getElementById(tabId).style.display = 'block';
+                
+                // Add active class to the clicked tab link
+                this.classList.add('active');
+                this.style.color = 'var(--primary-600)';
+                this.style.borderBottom = '3px solid var(--primary-600)';
+            });
+        });
+    });
+</script>
+{% endblock %}

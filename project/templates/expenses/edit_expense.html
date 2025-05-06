@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Expense - WealthifyMe{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 600px; margin: 2rem auto;">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title">Edit Expense</h1>
+        </div>
+        
+        <div class="card-body">
+            <form id="expenseForm" method="POST" action="{{ url_for('expenses_bp.edit_expense', expense_id=expense[0]) }}">
+                <div class="form-group">
+                    <label for="category" class="form-label">Category *</label>
+                    <select id="category" name="category" class="form-control form-select" required>
+                        {% for category in categories %}
+                            <option value="{{ category[0] }}" {% if category[0] == expense[1] %}selected{% endif %}>
+                                {{ category[1] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount" class="form-label">Amount ($) *</label>
+                    <input type="number" id="amount" name="amount" class="form-control" step="0.01" min="0.01" value="{{ expense[2] }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="description" class="form-label">Description *</label>
+                    <input type="text" id="description" name="description" class="form-control" value="{{ expense[3] }}" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="date" class="form-label">Date *</label>
+                    <input type="date" id="date" name="date" class="form-control" value="{{ formatted_date }}" required>
+                </div>
+                
+                <div class="form-group" style="margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Update Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
