@@ -1,0 +1,227 @@
+use wealthyinfyme;
+show databases;
+create database wealthyinfyme;
+
+drop table login;
+drop table registration;
+create table login(
+	S_NO int primary key auto_increment,
+    email varchar(50) not null,
+    password varchar(50) not null);
+
+insert into login(email,password) values("anuragjaswal9211@gmail.com","Anu@123"),("anu@123","Anu@123");
+insert into login(email,password) values("anu123@gmail.com","anu123");
+
+select * from login;
+
+use wealthyinfyme;
+
+create table registration(
+	S_NO int primary key auto_increment,
+    Name varchar(50) not null,
+    email varchar(50) not null,
+    password varchar(50) not null,
+    Date date 
+    );
+
+insert into registration(Name,email,password,Date) values("Prince222","prince123@gmail.com","prince@1222223",current_date());
+
+select * from login;
+select * from registration;
+
+
+DELIMITER //
+
+CREATE TRIGGER after_registration_insert
+AFTER INSERT ON registration
+FOR EACH ROW
+BEGIN
+    INSERT INTO login (email, password) 
+    VALUES (NEW.email, NEW.password);
+END$$
+//
+
+DELIMITER ;
+
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    amount DECIMAL(10, 2),
+    category VARCHAR(50),
+    description TEXT,
+    date DATE
+);
+
+select * from transactions;
+
+
+show tables;
+use wealthyinfyme;
+
+
+alter table login add column name varchar(50) not null after S_NO;
+
+
+show triggers;
+
+drop trigger after_registration_insert;
+
+
+
+DELIMITER //
+
+CREATE TRIGGER after_registration_insert
+AFTER INSERT ON registration
+FOR EACH ROW
+BEGIN
+    INSERT INTO login (name, email, password) 
+    VALUES (NEW.name, NEW.email, NEW.password);
+END;
+//
+
+DELIMITER ;
+
+update  login set name = "Anurag Jaswal" where S_NO=3;
+
+select * from login;
+
+
+
+
+-----------------------------------------------------
+For hint part
+-----------------------------------------------------
+
+
+class Config:
+    MYSQL_HOST = "localhost"
+    MYSQL_USER = "root"
+    MYSQL_PASSWORD = "33510jaswal"  # Your MySQL password
+    MYSQL_DB = "wealthyinfyme"
+    MYSQL_PORT = 3306  # Default MySQL port
+    MYSQL_UNIX_SOCKET = '/path/to/your/mysql/socket'  # Only needed for Unix socket connections
+    SECRET_KEY = "This_is_a_super_secret_key"
+    MYSQL_CURSORCLASS = 'DictCursor'
+
+for hint 
+
+use wealthyinfyme2;
+show databases;
+create database wealthyinfyme2;
+
+
+
+drop table login;
+
+
+CREATE TABLE login (
+    S_NO INT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(50) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    hint_question VARCHAR(255) NOT NULL,
+    hint_answer VARCHAR(255) NOT NULL
+);
+
+
+create table login(
+	S_NO int primary key auto_increment,
+    email varchar(50) not null,
+    password varchar(50) not null);
+
+insert into login(email,password) values("anuragjaswal9211@gmail.com","Anu@123"),("anu@123","Anu@123");
+insert into login(email,password) values("anu123@gmail.com","anu123");
+
+select * from login;
+
+
+
+create table registration(
+	S_NO int primary key auto_increment,
+    Name varchar(50) not null,
+    email varchar(50) not null,
+    password varchar(50) not null,
+    Date date
+    );
+
+insert into registration(Name,email,password,Date) values("Prince222","prince123@gmail.com","prince@1222223",current_date());
+
+select * from login;
+select * from registration;
+
+
+DELIMITER //
+
+CREATE TRIGGER after_registration_insert
+AFTER INSERT ON registration
+FOR EACH ROW
+BEGIN
+    INSERT INTO login (email, password) 
+    VALUES (NEW.email, NEW.password);
+END$$
+//
+
+DELIMITER ;
+
+CREATE TABLE transactions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    amount DECIMAL(10, 2),
+    category VARCHAR(50),
+    description TEXT,
+    date DATE
+);
+
+select * from transactions;
+
+
+show tables;
+use wealthyinfyme2;
+
+
+alter table login add column name varchar(50) not null after S_NO;
+
+
+show triggers;
+
+drop trigger after_registration_insert;
+
+
+
+DELIMITER //
+
+CREATE TRIGGER after_registration_insert
+AFTER INSERT ON registration
+FOR EACH ROW
+BEGIN
+    INSERT INTO login (name, email, password) 
+    VALUES (NEW.name, NEW.email, NEW.password);
+END;
+//
+
+DELIMITER ;
+
+update  login set name = "Anurag Jaswal" where S_NO=3;
+
+select * from login;
+select * from registration;
+
+ALTER TABLE registration
+ADD COLUMN hint_question VARCHAR(255),
+ADD COLUMN hint_answer VARCHAR(255);
+
+
+drop trigger after_registration_insert;
+
+
+DELIMITER //
+
+CREATE TRIGGER after_registration_insert
+AFTER INSERT ON registration
+FOR EACH ROW
+BEGIN
+    INSERT INTO login (name, email, password, hint_question, hint_answer) 
+    VALUES (NEW.name, NEW.email, NEW.password, NEW.hint_question, NEW.hint_answer);
+END;
+//
+
+DELIMITER ;
+
+
